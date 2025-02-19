@@ -1,6 +1,7 @@
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -11,7 +12,8 @@ namespace api.Controllers
 
     public class WeatherForecastController : ControllerBase
     {
-        string Password = "admin";
+        private string Ssername = "admin";
+        private string Password = "password123";
 
         private static readonly string[] Summaries = new[]
         {
@@ -19,6 +21,66 @@ namespace api.Controllers
         };
 
         private readonly ILogger<WeatherForecastController> _logger;
+
+        //SQL Injection
+        [HttpGet(Name = "GetUserData")]
+        public void GetUserData(string userId)
+        {
+            string connectionString = "your_connection_string";
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                string query = $"SELECT * FROM Users WHERE UserId = '{userId}'";
+                SqlCommand command = new SqlCommand(query, connection);
+                connection.Open();
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    Console.WriteLine(reader["Username"]);
+                }
+            }
+        }
+
+        //Insecure Cryptographic Storage
+        [HttpGet(Name = "EncryptData")]
+        public string EncryptData(string data)
+        {
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] inputBytes = Encoding.ASCII.GetBytes(data);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+                return Convert.ToBase64String(hashBytes);
+
+            }
+        }
+ 
+        //Cross-Site Scripting (XSS)
+        [HttpGet(Name = "GetUserInput")]
+        public string GetUserInput(string userInput)
+        {
+            // Simulate returning user input without sanitization
+            return $"<html><body>{userInput}</body></html>";
+        }
+
+        //Insecure Deserialization
+        [HttpGet(Name = "DeserializeData")]
+        public object DeserializeData(string serializedData)
+        {
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
+            BinaryFormatter formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
+            using (MemoryStream stream = new MemoryStream(Convert.FromBase64String(serializedData)))
+            {
+                return formatter.Deserialize(stream);
+            }
+        }
+
+        //Command Injection
+        [HttpGet(Name = "ExecuteCommand")]
+        public void ExecuteCommand(string userInput)
+        {
+            string command = $"cmd.exe /c {userInput}";
+            System.Diagnostics.Process.Start(command);
+        }
 
         public WeatherForecastController(ILogger<WeatherForecastController> logger)
         {
