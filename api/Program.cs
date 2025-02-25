@@ -7,6 +7,9 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Add HttpClient service for CurrencyExchangeController
+builder.Services.AddHttpClient<api.Controllers.CurrencyExchangeController>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
