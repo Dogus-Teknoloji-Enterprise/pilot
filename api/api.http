@@ -4,3 +4,11 @@ GET {{api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+GET {{api_HostAddress}}/CurrencyExchange/today
+Accept: application/json
+
+###
+
+GET {{api_HostAddress}}/CurrencyExchange/historical?date=2021-09-01
+Accept: application/json
