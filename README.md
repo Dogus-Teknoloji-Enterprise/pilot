@@ -38,6 +38,7 @@ The API will be available at:
 
 - GET `/weatherforecast` - Returns weather forecast data
 - POST `/weatherforecast` - Creates a new weather forecast entry
+- GET `/currency-exchange` - Returns currency exchange rates
 
 ## Development
 
